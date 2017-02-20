@@ -332,7 +332,7 @@ function LAqZed:Harass(target)
             end
         end
         if not longHarass then
-            if target.disance < Q.Range and self:CanCast(_Q) and harassQ then
+            if target.distance < Q.Range and self:CanCast(_Q) and harassQ then
                 local qPos = target:GetPrediction(Q.Speed, Q.Delay)
                 self:CastQ(qPos)
             end
