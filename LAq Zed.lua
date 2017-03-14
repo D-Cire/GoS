@@ -372,7 +372,7 @@ function LAqZed:CastQ(position)
 end
 
 function LAqZed:CastW(position)
-    if position then
+    if position and MapPosition:inWall(position) == false then
         --PrintChat(GetTickCount() .. "TRYING TO CAST W1")
         Control.CastSpell(HK_W, position)
         if not self:HasBuff(myHero, "ZedWHandler") then
