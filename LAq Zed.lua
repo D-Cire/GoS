@@ -30,7 +30,10 @@ function LAqZed:LoadMenu()
     self.Menu.Combo:MenuElement({id = "ComboW", name = "Use W", value = true})
     self.Menu.Combo:MenuElement({id = "ComboE", name = "Use E", value = true})
     self.Menu.Combo:MenuElement({id = "ComboR", name = "Use R", value = true})
+    self.Menu.Combo:MenuElement({id = "SwapR", name = "Swap back to R?", value = true})
     self.Menu.Combo:MenuElement({id = "RKillable", name = "Only Ult when Killable", value = true})
+    self.Menu.Combo:MenuElement({id = "Ignite", name = "Ignite in combo?", value = true})
+    self.Menu.Combo:MenuElement({id = "IgniteOnR", name = "Only Ignite after Ult?", value = true})
     self.Menu.Combo:MenuElement({id = "ComboMode", name = "Combo Mode [?]", drop = {"Normal", "Line", "Illuminati", "The Angel [COMING SOON]"}, tooltip = "Must have QWER available to perform 'Line', 'Illuminati', and 'The Angel'"})
 
     --[[Harass]]
@@ -50,6 +53,8 @@ function LAqZed:LoadMenu()
     --[[Misc]]
     self.Menu:MenuElement({type = MENU, id = "Misc", name = "Misc Settings"})
     self.Menu.Misc:MenuElement({id = "KS", name = "KS with Q", value = true})
+    self.Menu.Misc:MenuElement({id = "PreventW", name = "Prevent W from colliding with walls?", value = true})
+    self.Menu.Misc:MenuElement({id = "Ignite", name = "Ignite if killable?", value = true})
     self.Menu.Misc:MenuElement({type = SPACE, id = "TODO", name = "Need things to add - Give feedback."})
 
 	--[[Items]]
@@ -57,6 +62,7 @@ function LAqZed:LoadMenu()
 	self.Menu.Items:MenuElement({id = "useCut", name = "Bilgewater Cutlass", value = true})
 	self.Menu.Items:MenuElement({id = "useBork", name = "Blade of the Ruined King", value = true})
 	self.Menu.Items:MenuElement({id = "useGhost", name = "Youmuu's Ghostblade", value = true})
+    self.Menu.Items:MenuElement({id = "ghostDist", name = "Distance to use Ghostblade", value = 600, min = 0, max = 1500, step = 50})
 	self.Menu.Items:MenuElement({id = "useGun", name = "Hextech Gunblade", value = true})
 	self.Menu.Items:MenuElement({id = "useRedPot", name = "Elixir of Wrath", value = true})
 	self.Menu.Items:MenuElement({id = "useTiamat", name = "Tiamat", value = true})
@@ -109,13 +115,24 @@ function LAqZed:Tick()
 
     local comboTarget = self:GetTarget(Q.Range)
     local harassTarget = self:GetTarget(W.Range + Q.Range)
+    local ghostTarget = self:GetTarget(self.Menu.Items.ghostDist:Value())
 
     if self:Mode() == "Combo" then
         self:Combo(comboTarget)
+        if ghostTarget then
+            self:useItem(ghostTarget)
+        end
     elseif self:Mode() == "Harass" then
         self:Harass(harassTarget)
     elseif self:Mode() == "Farm" then
         self:Farm()
+    end
+
+    if self.Menu.Misc.Ignite:Value() then
+        iTarget = self:GetTarget(600)
+        if iTarget and (iTarget.health+iTarget.shieldAD) <= (50+20*myHero.levelData.lvl) then
+            self:Ignite(iTarget)
+        end
     end
 end
 
@@ -157,7 +174,7 @@ function LAqZed:useItem(target)
 			end
 		end
 	end
-	if ghost >= 1 and GetDistance(myHero.pos,target.pos) <= 550 + 25 and self.Menu.Items.useGhost:Value() then
+	if ghost >= 1 and GetDistance(myHero.pos,target.pos) <= self.Menu.Items.ghostDist:Value() and self.Menu.Items.useGhost:Value() then
 		if CanUseSpell(ghost) then
 			Control.CastSpell(Item_HK[ghost])
 		end
@@ -182,6 +199,16 @@ function LAqZed:useItem(target)
 	end
 end
 
+function LAqZed:Ignite(target)
+    if target and GetDistance(myHero.pos, target.pos) <= 600 then
+        if myHero:GetSpellData(SUMMONER_1).name == "SummonerDot" and self:IsReady(SUMMONER_1) then
+            Control.CastSpell(HK_SUMMONER_1, target)
+        elseif myHero:GetSpellData(SUMMONER_2).name == "SummonerDot" and self:IsReady(SUMMONER_2) then
+            Control.CastSpell(HK_SUMMONER_2, target)
+        end
+    end
+end
+
 function LAqZed:Combo(target)
     local comboMode = self.Menu.Combo.ComboMode:Value()
     if target and self:CanCast(_R) then
@@ -199,6 +226,9 @@ function LAqZed:Combo(target)
         if target then
             self:NormalCombo(target)
         end
+    end
+    if self.Menu.Combo.Ignite:Value() and self.Menu.Combo.IgniteOnR:Value() == false then
+        self:Ignite(target)
     end
 end
 
@@ -218,6 +248,9 @@ function LAqZed:NormalCombo(target)
         elseif self:CanCast(_E) and self.Menu.Combo.ComboE:Value() and target.distance < E.Range then
             self:CastE()
         end
+        if self.Menu.Combo.Ignite:Value() and self.Menu.Combo.IgniteOnR:Value() and myHero:GetSpellData(_R).name == "ZedR2" then
+            self:Ignite(target)
+        end
 		self:useItem(target)
     end
 end
@@ -236,6 +269,9 @@ function LAqZed:LineCombo(target)
                     if self:CanCast(_Q) and self.Menu.Combo.ComboQ:Value() then
                         local castPos = target:GetPrediction(Q.Speed, Q.Delay)
                         self:CastQ(castPos)
+                    end
+                    if self.Menu.Combo.Ignite:Value() and self.Menu.Combo.IgniteOnR:Value() and myHero:GetSpellData(_R).name == "ZedR2" then
+                        self:Ignite(target)
                     end
 					self:useItem(target)
                 end, 0.75)
@@ -273,6 +309,10 @@ function LAqZed:IlluminatiCombo(target)
                         local castPos = target:GetPrediction(Q.Speed, Q.Delay)
                         self:CastQ(castPos)
                     end
+                    if self.Menu.Combo.Ignite:Value() and self.Menu.Combo.IgniteOnR:Value() and myHero:GetSpellData(_R).name == "ZedR2" then
+                        self:Ignite(target)
+                    end
+                    self:useItem(target)
                 end, 0.75)
             end
             if self:CanCast(_E) and self.Menu.Combo.ComboE:Value() then
@@ -372,11 +412,13 @@ function LAqZed:CastQ(position)
 end
 
 function LAqZed:CastW(position)
-    if position and MapPosition:inWall(position) == false then
-        --PrintChat(GetTickCount() .. "TRYING TO CAST W1")
-        Control.CastSpell(HK_W, position)
-        if not self:HasBuff(myHero, "ZedWHandler") then
-            _shadow = position
+    if position then
+        if (self.Menu.Misc.PreventW:Value() and MapPosition:inWall(position) == false) or self.Menu.Misc.PreventW:Value() == false then
+            --PrintChat(GetTickCount() .. "TRYING TO CAST W1")
+            Control.CastSpell(HK_W, position)
+            if not self:HasBuff(myHero, "ZedWHandler") then
+                _shadow = position
+            end
         end
     else
         if self:HasBuff(myHero, "ZedWHandler") then
@@ -396,7 +438,7 @@ function LAqZed:CastR(target)
     if target and self:CanCast(_R) and myHero:GetSpellData(_R).name == "ZedR" then
         --PrintChat(GetTickCount() .. "TRYING TO CAST R1")
         Control.CastSpell(HK_R, target)
-    elseif myHero:GetSpellData(_R).name == "ZedR2" then
+    elseif myHero:GetSpellData(_R).name == "ZedR2" and self.Menu.Combo.SwapR:Value() then
         --PrintChat(GetTickCount() .. "TRYING TO CAST R2")
         Control.CastSpell(HK_R)
     end
