@@ -8,10 +8,14 @@ function LAUdyr:__init()
     self:LoadSpells()
     self:LoadMenu()
     AACounter = 0
-    AATick = 0
     RTime = 0
     Callback.Add("Tick", function() self:Tick() end)
     Callback.Add("Draw", function() self:Draw() end)
+    _G.SDK.Orbwalker:OnPostAttack(function()
+        if self:HasBuff(myHero, "udyrphoenixstance") == true then
+            AACounter = AACounter+1
+        end
+    end)
 end
 
 function LAUdyr:LoadSpells()
@@ -65,6 +69,8 @@ end
 function LAUdyr:Tick()
     if myHero.dead then return end
 
+    print(AACounter)
+
     if _G.SDK.Orbwalker.Modes[_G.SDK.ORBWALKER_MODE_COMBO] then
         self:Combo()
     elseif _G.SDK.Orbwalker.Modes[_G.SDK.ORBWALKER_MODE_LANECLEAR] then
@@ -78,13 +84,6 @@ function LAUdyr:Tick()
     if RTime <= GetTickCount() and myHero:GetSpellData(_R).currentCd > 0 then
         AACounter = 0
         RTime = GetTickCount()+(myHero:GetSpellData(_R).cd*1000)
-    end
-
-    if AATick < GetTickCount() and myHero.attackData.state == STATE_WINDDOWN then
-        if self:HasBuff(myHero, "udyrphoenixstance") == true then
-            AACounter = AACounter+1
-            AATick = GetTickCount() + myHero.attackData.windDownTime*1000 + ((myHero.attackData.windDownTime*1000)*0.10)
-        end
     end
 end
 
