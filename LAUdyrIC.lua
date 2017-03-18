@@ -65,8 +65,6 @@ end
 function LAUdyr:Tick()
     if myHero.dead then return end
 
-    print(AACounter)
-
     if _G.SDK.Orbwalker.Modes[_G.SDK.ORBWALKER_MODE_COMBO] then
         self:Combo()
     elseif _G.SDK.Orbwalker.Modes[_G.SDK.ORBWALKER_MODE_LANECLEAR] then
