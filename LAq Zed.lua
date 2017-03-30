@@ -57,17 +57,17 @@ function LAqZed:LoadMenu()
     self.Menu.Misc:MenuElement({id = "Ignite", name = "Ignite if killable?", value = true})
     self.Menu.Misc:MenuElement({type = SPACE, id = "TODO", name = "Need things to add - Give feedback."})
 
-	--[[Items]]
-	self.Menu:MenuElement({type = MENU, id = "Items", name = "Item Settings"})
-	self.Menu.Items:MenuElement({id = "useCut", name = "Bilgewater Cutlass", value = true})
-	self.Menu.Items:MenuElement({id = "useBork", name = "Blade of the Ruined King", value = true})
-	self.Menu.Items:MenuElement({id = "useGhost", name = "Youmuu's Ghostblade", value = true})
+    --[[Items]]
+    self.Menu:MenuElement({type = MENU, id = "Items", name = "Item Settings"})
+    self.Menu.Items:MenuElement({id = "useCut", name = "Bilgewater Cutlass", value = true})
+    self.Menu.Items:MenuElement({id = "useBork", name = "Blade of the Ruined King", value = true})
+    self.Menu.Items:MenuElement({id = "useGhost", name = "Youmuu's Ghostblade", value = true})
     self.Menu.Items:MenuElement({id = "ghostDist", name = "Distance to use Ghostblade", value = 600, min = 0, max = 1500, step = 50})
-	self.Menu.Items:MenuElement({id = "useGun", name = "Hextech Gunblade", value = true})
-	self.Menu.Items:MenuElement({id = "useRedPot", name = "Elixir of Wrath", value = true})
-	self.Menu.Items:MenuElement({id = "useTiamat", name = "Tiamat", value = true})
-	self.Menu.Items:MenuElement({id = "useHydra", name = "Ravenous Hydra", value = true})
-	self.Menu.Items:MenuElement({id = "useTitantic", name = "Titanic Hydra", value = true})
+    self.Menu.Items:MenuElement({id = "useGun", name = "Hextech Gunblade", value = true})
+    self.Menu.Items:MenuElement({id = "useRedPot", name = "Elixir of Wrath", value = true})
+    self.Menu.Items:MenuElement({id = "useTiamat", name = "Tiamat", value = true})
+    self.Menu.Items:MenuElement({id = "useHydra", name = "Ravenous Hydra", value = true})
+    self.Menu.Items:MenuElement({id = "useTitantic", name = "Titanic Hydra", value = true})
 
     --[[Draw]]
     self.Menu:MenuElement({type = MENU, id = "Draw", name = "Drawing Settings"})
@@ -92,11 +92,11 @@ function aGetItemSlot(unit, id)
 end
 
 local function GetDistance(p1,p2)
-	return  math.sqrt(math.pow((p2.x - p1.x),2) + math.pow((p2.y - p1.y),2) + math.pow((p2.z - p1.z),2))
+    return  math.sqrt(math.pow((p2.x - p1.x),2) + math.pow((p2.y - p1.y),2) + math.pow((p2.z - p1.z),2))
 end
 
 local function CanUseSpell(spell)
-	return myHero:GetSpellData(spell).currentCd == 0 and myHero:GetSpellData(spell).level > 0 and myHero:GetSpellData(spell).mana <= myHero.mana
+    return myHero:GetSpellData(spell).currentCd == 0 and myHero:GetSpellData(spell).level > 0 and myHero:GetSpellData(spell).mana <= myHero.mana
 end
 
 local ItemTick = GetTickCount()
@@ -138,65 +138,65 @@ end
 
 function LAqZed:useItem(target)
 
-	local ticker = GetTickCount()
-	if 	ItemTick + 5000 < ticker then
-		Item_HK[ITEM_1] = HK_ITEM_1
-		Item_HK[ITEM_2] = HK_ITEM_2
-		Item_HK[ITEM_3] = HK_ITEM_3
-		Item_HK[ITEM_4] = HK_ITEM_4
-		Item_HK[ITEM_5] = HK_ITEM_5
-		Item_HK[ITEM_6] = HK_ITEM_6
-		Item_HK[ITEM_7] = HK_ITEM_7
-		CutBlade = aGetItemSlot(myHero,3144)
-		bork = aGetItemSlot(myHero,3153)
-		ghost = aGetItemSlot(myHero,3142)
-		redpot = aGetItemSlot(myHero,140)
-		bluepot = aGetItemSlot(myHero,2139)
-		gun = aGetItemSlot(myHero,3146)
-		hydra = aGetItemSlot(myHero, 3074)
-		tiamat = aGetItemSlot(myHero, 3077)
-		titanic = aGetItemSlot(myHero, 3748)
-		ItemTick = ticker
-	end
-	if target.type == Obj_AI_Hero then
-		if CutBlade >= 1 and GetDistance(myHero.pos,target.pos) <= 550 + 25 and self.Menu.Items.useCut:Value() then
-			if CanUseSpell(CutBlade) then
-				Control.CastSpell(Item_HK[CutBlade], target.pos)
-			end
-		elseif bork >= 1 and GetDistance(myHero.pos,target.pos) <= 550 + 25 and self.Menu.Items.useBork:Value() then
-			if CanUseSpell(bork) then
-				Control.CastSpell(Item_HK[bork], target.pos)
-			end
-		end
-		if gun >= 1 and GetDistance(myHero.pos,target.pos) <= 690 + 25 and self.Menu.Items.useGun:Value() then
-			if CanUseSpell(gun) then
-				Control.CastSpell(Item_HK[gun],target.pos)
-			end
-		end
-	end
-	if ghost >= 1 and GetDistance(myHero.pos,target.pos) <= self.Menu.Items.ghostDist:Value() and self.Menu.Items.useGhost:Value() then
-		if CanUseSpell(ghost) then
-			Control.CastSpell(Item_HK[ghost])
-		end
-	end
-	if redpot >= 1 and GetDistance(myHero.pos,target.pos) <= 550 + 100  and self.Menu.Items.useRedPot:Value() then
-		if CanUseSpell(redpot) then
-			Control.CastSpell(Item_HK[redpot])
-		end
-	end
-	if hydra >= 1 and GetDistance(myHero.pos, target.pos) <= 270 and self.Menu.Items.useHydra:Value() then
-		if CanUseSpell(hydra) then
-			Control.CastSpell(Item_HK[hydra])
-		end
-	elseif tiamat >= 1 and GetDistance(myHero.pos, target.pos) <= 270 and self.Menu.Items.useTiamat:Value() then
-		if CanUseSpell(tiamat) then
-			Control.CastSpell(Item_HK[tiamat])
-		end
-	elseif titanic >= 1 and GetDistance(myHero.pos, target.pos) <= 200 and self.Menu.Items.useTitanic:Value() then
-		if CanUseSpell(titanic) then
-			Control.CastSpell(Item_HK[titanic])
-		end
-	end
+    local ticker = GetTickCount()
+    if  ItemTick + 5000 < ticker then
+        Item_HK[ITEM_1] = HK_ITEM_1
+        Item_HK[ITEM_2] = HK_ITEM_2
+        Item_HK[ITEM_3] = HK_ITEM_3
+        Item_HK[ITEM_4] = HK_ITEM_4
+        Item_HK[ITEM_5] = HK_ITEM_5
+        Item_HK[ITEM_6] = HK_ITEM_6
+        Item_HK[ITEM_7] = HK_ITEM_7
+        CutBlade = aGetItemSlot(myHero,3144)
+        bork = aGetItemSlot(myHero,3153)
+        ghost = aGetItemSlot(myHero,3142)
+        redpot = aGetItemSlot(myHero,140)
+        bluepot = aGetItemSlot(myHero,2139)
+        gun = aGetItemSlot(myHero,3146)
+        hydra = aGetItemSlot(myHero, 3074)
+        tiamat = aGetItemSlot(myHero, 3077)
+        titanic = aGetItemSlot(myHero, 3748)
+        ItemTick = ticker
+    end
+    if target.type == Obj_AI_Hero then
+        if CutBlade >= 1 and GetDistance(myHero.pos,target.pos) <= 550 + 25 and self.Menu.Items.useCut:Value() then
+            if CanUseSpell(CutBlade) then
+                Control.CastSpell(Item_HK[CutBlade], target.pos)
+            end
+        elseif bork >= 1 and GetDistance(myHero.pos,target.pos) <= 550 + 25 and self.Menu.Items.useBork:Value() then
+            if CanUseSpell(bork) then
+                Control.CastSpell(Item_HK[bork], target.pos)
+            end
+        end
+        if gun >= 1 and GetDistance(myHero.pos,target.pos) <= 690 + 25 and self.Menu.Items.useGun:Value() then
+            if CanUseSpell(gun) then
+                Control.CastSpell(Item_HK[gun],target.pos)
+            end
+        end
+    end
+    if ghost >= 1 and GetDistance(myHero.pos,target.pos) <= self.Menu.Items.ghostDist:Value() and self.Menu.Items.useGhost:Value() then
+        if CanUseSpell(ghost) then
+            Control.CastSpell(Item_HK[ghost])
+        end
+    end
+    if redpot >= 1 and GetDistance(myHero.pos,target.pos) <= 550 + 100  and self.Menu.Items.useRedPot:Value() then
+        if CanUseSpell(redpot) then
+            Control.CastSpell(Item_HK[redpot])
+        end
+    end
+    if hydra >= 1 and GetDistance(myHero.pos, target.pos) <= 270 and self.Menu.Items.useHydra:Value() then
+        if CanUseSpell(hydra) then
+            Control.CastSpell(Item_HK[hydra])
+        end
+    elseif tiamat >= 1 and GetDistance(myHero.pos, target.pos) <= 270 and self.Menu.Items.useTiamat:Value() then
+        if CanUseSpell(tiamat) then
+            Control.CastSpell(Item_HK[tiamat])
+        end
+    elseif titanic >= 1 and GetDistance(myHero.pos, target.pos) <= 200 and self.Menu.Items.useTitanic:Value() then
+        if CanUseSpell(titanic) then
+            Control.CastSpell(Item_HK[titanic])
+        end
+    end
 end
 
 function LAqZed:Ignite(target)
@@ -251,7 +251,7 @@ function LAqZed:NormalCombo(target)
         if self.Menu.Combo.Ignite:Value() and self.Menu.Combo.IgniteOnR:Value() and myHero:GetSpellData(_R).name == "ZedR2" then
             self:Ignite(target)
         end
-		self:useItem(target)
+        self:useItem(target)
     end
 end
 
@@ -273,15 +273,15 @@ function LAqZed:LineCombo(target)
                     if self.Menu.Combo.Ignite:Value() and self.Menu.Combo.IgniteOnR:Value() and myHero:GetSpellData(_R).name == "ZedR2" then
                         self:Ignite(target)
                     end
-					self:useItem(target)
+                    self:useItem(target)
                 end, 0.75)
             end
             if self:CanCast(_E) and self.Menu.Combo.ComboE:Value() then
-				if self:CanCast(_W) and myHero:GetSpellData(_W).name == "ZedW2" then
-					self:CastE()
-				elseif not self:CanCast(_W) then
-					self:CastE()
-				end
+                if self:CanCast(_W) and myHero:GetSpellData(_W).name == "ZedW2" then
+                    self:CastE()
+                elseif not self:CanCast(_W) then
+                    self:CastE()
+                end
             end
             if myHero:GetSpellData(_W).name == "ZedW2" and self:CanCast(_Q) and not self:CanCast(_E)then
                 DelayAction(function()
@@ -316,11 +316,11 @@ function LAqZed:IlluminatiCombo(target)
                 end, 0.75)
             end
             if self:CanCast(_E) and self.Menu.Combo.ComboE:Value() then
-				if self:CanCast(_W) and myHero:GetSpellData(_W).name == "ZedW2" then
-					self:CastE()
-				elseif not self:CanCast(_W) then
-					self:CastE()
-				end
+                if self:CanCast(_W) and myHero:GetSpellData(_W).name == "ZedW2" then
+                    self:CastE()
+                elseif not self:CanCast(_W) then
+                    self:CastE()
+                end
             end
             if myHero:GetSpellData(_W).name == "ZedW2" and self:CanCast(_Q) and not self:CanCast(_E)then
                 DelayAction(function()
@@ -398,7 +398,7 @@ function LAqZed:Farm()
         local minion = self:GetFarmTarget(E.Range)
         if minion and self:IsValidTarget(minion, E.Range) then
             self:CastE()
-			self:useItem(minion)
+            self:useItem(minion)
         end
     end
 
@@ -503,16 +503,47 @@ function LAqZed:Draw()
 end
 
 function LAqZed:Mode()
-    if Orbwalker["Combo"].__active then
+    if _G.GOS ~= nil then
+        return GOS.GetMode()
+    elseif _G.EOWLoaded ~= nil then
+        return self:EOWModes()
+    elseif _G.SDK ~= nil then
+        return self:ICModes()
+    elseif Orbwalker["Combo"].__active then
         return "Combo"
     elseif Orbwalker["Harass"].__active then
         return "Harass"
     elseif Orbwalker["Farm"].__active then
-        return "Farm"
+        return "Clear"
     elseif Orbwalker["LastHit"].__active then
         return "LastHit"
     end
     return ""
+end
+
+function LAqZed:EOWModes()
+    local eowm = EOW:Mode()
+    if eowm == "LaneClear" then
+        return "Clear"
+    else
+        return eowm
+    end
+end
+
+function LAqZed:ICModes()
+    if _G.SDK.Orbwalker.Modes[_G.SDK.ORBWALKER_MODE_COMBO] then
+        return "Combo"
+    elseif _G.SDK.Orbwalker.Modes[_G.SDK.ORBWALKER_MODE_HARASS] then
+        return "Harass"
+    elseif _G.SDK.Orbwalker.Modes[_G.SDK.ORBWALKER_MODE_LANECLEAR] then
+        return "Clear"
+    elseif _G.SDK.Orbwalker.Modes[_G.SDK.ORBWALKER_MODE_JUNGLECLEAR] then
+        return "Clear"
+    elseif _G.SDK.Orbwalker.Modes[_G.SDK.ORBWALKER_MODE_LASTHIT] then
+        return "LastHit"
+    elseif _G.SDK.Orbwalker.Modes[_G.SDK.ORBWALKER_MODE_FLEE] then
+        return "Flee"
+    end
 end
 
 function LAqZed:GetShadow()
