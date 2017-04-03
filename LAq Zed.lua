@@ -211,7 +211,7 @@ end
 
 function LAqZed:Combo(target)
     local comboMode = self.Menu.Combo.ComboMode:Value()
-    if target and self:CanCast(_R) then
+    if target and self:CanCast(_R) and self.Menu.Combo.ComboR:Value() then
         if comboMode == 1 then
             self:NormalCombo(target)
         elseif comboMode == 2 then
@@ -234,7 +234,7 @@ end
 
 function LAqZed:NormalCombo(target)
     if target and self:IsValidTarget(target, R.Range + W.Range) then
-        if myHero:GetSpellData(_R).name ~= "ZedR2" and self:IsValidTarget(target, R.Range) and self:CanCast(_R) then
+        if self.Menu.Combo.ComboR:Value() and myHero:GetSpellData(_R).name ~= "ZedR2" and self:IsValidTarget(target, R.Range) and self:CanCast(_R) then
             self:CastR(target)
         end
         if myHero:GetSpellData(_W).name == "ZedW2" and self:CanCast(_W) and self.Menu.Combo.ComboW:Value() then
