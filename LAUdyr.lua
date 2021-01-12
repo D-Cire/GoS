@@ -27,7 +27,7 @@ function LAUdyr:LoadSpells()
 end
 
 function LAUdyr:LoadMenu()
-    self.Menu = MenuElement({type = MENU, id = "LAUdyr", name = "LA Godyr", leftIcon="http://i.imgur.com/LpRcDiX.png"})
+    self.Menu = MenuElement({type = MENU, id = "LAUdyr", name = "LA Godyr", leftIcon="https://raw.githubusercontent.com/D-Cire/GoS/Ext/Haha.png"})
 
     --[[Playstyle Settings]]
     self.Menu:MenuElement({type = MENU, id = "Style", name = "Playstyle Settings"})
